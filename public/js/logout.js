@@ -1,44 +1,39 @@
-const login = async (event) => {
+const logoutBtn = document.querySelector(".logout");
+const loginBtn = document.querySelector(".login");
+const signupBtn = document.querySelector(".signup");
+const createpostBtn = document.querySelector(".createpost");
+
+const logout = async (event) => {
     event.preventDefault();
+    const response = await fetch("/api/users/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });  
+    if (response.ok) document.location.replace("/");
+  };
 
-    const name = document.querySelector("#name-login").value.trim();
-    const password = document.querySelector("#password-login").value.trim();
-
-    if (name && password) {
-        const response = await fetch("/api/users/login", {
-            method: "POST",
-            body: JSON.stringify({ name, password }),
-            headers: { "Content-Type": "application/json" },
-        });
-
-        if (response.ok) {
-            document.location.replace("/dashboard");
-        } else {
-            alert(name +" could not log in");
-        }
-    }
-};
-
-const signup = async (event) => {
+  const login = async (event) => {
     event.preventDefault();
+    document.location.replace("/login")
+  };
 
-    const name = document.querySelector("#name-signup").value.trim();
-    const password = document.querySelector("#password-signup").value.trim();
+  const createpost = async (event) => {
+    event.preventDefault();
+    document.location.replace("/api/posts")
+  };
+  
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", logout);
+  }
 
-    if (name && password) {
-        const response = await fetch("/api/users", {
-            method: "POST",
-            body: JSON.stringify({ name, password }),
-            headers: { "Content-Type": "application/json" },
-        });
-        
-        if (response.ok) {
-            document.location.replace("/");
-        } else {
-            alert("Error creating user");
-        }
-    }
-};
+  if (loginBtn) {
+    loginBtn.addEventListener("click", login);
+  }
 
-document.querySelector(".login-form").addEventListener("submit", login);
-document.querySelector(".signup-form").addEventListener("submit", signup);
+  if (signupBtn) {
+    signupBtn.addEventListener("click", login);
+  }
+
+  if (createpostBtn) {
+    createpostBtn.addEventListener("click", createpost);
+  }

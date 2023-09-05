@@ -1,44 +1,73 @@
-const login = async (event) => {
+const titleEl = document.querySelector("#title");
+const contentEl = document.querySelector("#content");
+const createLink = document.querySelector("#createPost");
+const cancelBtn = document.querySelector("#cancelPost");
+const updateBtn = document.querySelector("#updatePost");
+const deleteBtn = document.querySelector("#deletePost");
+
+
+const cancelPostHandler = async (event) => {
+    event.preventDefault();
+    document.location.replace("/dashboard");
+}
+
+const updatePostHandler = async (event) => {
+    event.preventDefault();
+    const title = titleEl.value;
+    const content = contentEl.value;
+    if (title.length > 0 && content.length > 0) {
+        const id = document.location.pathname.split("/").at(-1);
+        const response = await fetch(`/dashboard/post/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({ title, content }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) document.location.replace(`/dashboard`);
+        else alert("Failed to update post.");
+    } else {
+        alert("Your post must have a title and contents");
+    }
+}
+
+const deletePostHandler = async (event) => {
     event.preventDefault();
 
-    const name = document.querySelector("#name-login").value.trim();
-    const password = document.querySelector("#password-login").value.trim();
+    const id = document.location.pathname.split("/").at(-1);
+    const response = await fetch(`/dashboard/post/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+    });
 
-    if (name && password) {
-        const response = await fetch("/api/users/login", {
+    if (response.ok) document.location.replace("/dashboard");
+    else alert("Failed to delete post.");
+}
+
+const createPostHandler = async (event) => {
+    const title = titleEl.value;
+    const content = contentEl.value;
+    event.preventDefault();
+    if (title.length > 0 && content.length > 0) {
+
+        const response = await fetch("/dashboard/post", {
             method: "POST",
-            body: JSON.stringify({ name, password }),
+            body: JSON.stringify({ title, content }),
             headers: { "Content-Type": "application/json" },
         });
 
         if (response.ok) {
-            document.location.replace("/dashboard");
+            document.location.replace(`/dashboard`);
         } else {
-            alert(name +" could not log in");
+            alert("Failed to create post.");
         }
+
     }
-};
+}
 
-const signup = async (event) => {
-    event.preventDefault();
-
-    const name = document.querySelector("#name-signup").value.trim();
-    const password = document.querySelector("#password-signup").value.trim();
-
-    if (name && password) {
-        const response = await fetch("/api/users", {
-            method: "POST",
-            body: JSON.stringify({ name, password }),
-            headers: { "Content-Type": "application/json" },
-        });
-        
-        if (response.ok) {
-            document.location.replace("/");
-        } else {
-            alert("Error creating user");
-        }
-    }
-};
-
-document.querySelector(".login-form").addEventListener("submit", login);
-document.querySelector(".signup-form").addEventListener("submit", signup);
+if (createLink) {
+    createLink.addEventListener("click", createPostHandler);
+    cancelBtn.addEventListener("click", cancelPostHandler);
+} else {
+    updateBtn.addEventListener("click", updatePostHandler);
+    deleteBtn.addEventListener("click", deletePostHandler);
+}
